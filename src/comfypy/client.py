@@ -24,7 +24,9 @@ class ComfyClient:
     state across calls.  Instances are safe to share across threads.
     """
 
-    def __init__(self, base_url: str = "http://127.0.0.1:8188", client_id: str | None = None):
+    def __init__(
+        self, base_url: str = "http://127.0.0.1:8188", client_id: str | None = None
+    ):
         self.base_url = base_url.rstrip("/")
         self.client_id = client_id or uuid.uuid4().hex
         self._ws = None  # lazily connected via _ensure_connected()
@@ -371,9 +373,7 @@ def post_json(base_url: str, path: str, body: dict | None = None):
     if body is not None:
         data = json.dumps(body).encode("utf-8")
         headers["Content-Type"] = "application/json"
-    req = urllib.request.Request(
-        _build_url(base_url, path), data=data, headers=headers
-    )
+    req = urllib.request.Request(_build_url(base_url, path), data=data, headers=headers)
     with urllib.request.urlopen(req) as resp:
         return json.loads(resp.read())
 
@@ -384,9 +384,7 @@ def _post_no_body(base_url: str, path: str, body: dict | None = None):
     if body is not None:
         data = json.dumps(body).encode("utf-8")
         headers["Content-Type"] = "application/json"
-    req = urllib.request.Request(
-        _build_url(base_url, path), data=data, headers=headers
-    )
+    req = urllib.request.Request(_build_url(base_url, path), data=data, headers=headers)
     urllib.request.urlopen(req)
 
 
@@ -417,9 +415,7 @@ def post_multipart(
             body_bytes += value + b"\r\n"
         else:
             body_bytes += (
-                f'Content-Disposition: form-data; name="{name}"\r\n'
-                f"\r\n"
-                f"{value}\r\n"
+                f'Content-Disposition: form-data; name="{name}"\r\n\r\n{value}\r\n'
             ).encode()
 
     body_bytes += ("--" + boundary + "--\r\n").encode()

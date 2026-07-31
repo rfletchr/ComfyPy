@@ -3,8 +3,7 @@
 Python client for the [ComfyUI](https://github.com/comfyanonymous/ComfyUI) API. HTTP and WebSocket, sync, stdlib where possible.
 
 ```python
-from comfypy.client import ComfyClient
-from comfypy.ws import ExecutionStarted, NodeProgress, ExecutionFinished
+from comfypy import ComfyClient, ExecutionStarted, NodeProgress, ExecutionFinished
 
 client = ComfyClient()
 
@@ -44,9 +43,15 @@ prompt = {
     },
     "53": {
         "inputs": {
-            "seed": 269671452348788, "steps": 20, "cfg": 8,
-            "sampler_name": "euler", "scheduler": "simple", "denoise": 1,
-            "model": ["4", 0], "positive": ["6", 0], "negative": ["7", 0],
+            "seed": 269671452348788,
+            "steps": 20,
+            "cfg": 8,
+            "sampler_name": "euler",
+            "scheduler": "simple",
+            "denoise": 1,
+            "model": ["4", 0],
+            "positive": ["6", 0],
+            "negative": ["7", 0],
             "latent_image": ["5", 0],
         },
         "class_type": "KSampler",

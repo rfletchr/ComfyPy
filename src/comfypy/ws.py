@@ -12,15 +12,18 @@ logger = logging.getLogger(__name__)
 # Event types — what the iterator yields.
 # ------------------------------------------------------------------
 
+
 @dataclass(frozen=True, kw_only=True)
 class ExecutionStarted:
     """The prompt was dequeued and execution began."""
+
     prompt_id: str
 
 
 @dataclass(frozen=True, kw_only=True)
 class ExecutionCached:
     """All nodes were cached from a previous run — execution was skipped."""
+
     prompt_id: str
     nodes: list[str]
 
@@ -28,12 +31,14 @@ class ExecutionCached:
 @dataclass(frozen=True, kw_only=True)
 class QueueUpdated:
     """The execution queue changed (broadcast to all sockets)."""
+
     queue_remaining: int
 
 
 @dataclass(frozen=True, kw_only=True)
 class NodeExecuting:
     """A node started executing."""
+
     node_id: str
     display_node: str
     prompt_id: str
@@ -42,6 +47,7 @@ class NodeExecuting:
 @dataclass(frozen=True, kw_only=True)
 class NodeExecuted:
     """A node finished executing."""
+
     node_id: str
     display_node: str
     output: dict
@@ -51,6 +57,7 @@ class NodeExecuted:
 @dataclass(frozen=True, kw_only=True)
 class NodeProgress:
     """Sampler / progress update from a node."""
+
     node_id: str
     value: int
     max: int
@@ -60,18 +67,21 @@ class NodeProgress:
 @dataclass(frozen=True, kw_only=True)
 class ExecutionFinished:
     """The prompt finished executing (all nodes done)."""
+
     prompt_id: str
 
 
 @dataclass(frozen=True, kw_only=True)
 class ExecutionSuccess:
     """The server confirmed execution completed without errors."""
+
     prompt_id: str
 
 
 @dataclass(frozen=True, kw_only=True)
 class ExecutionError:
     """A node errored during execution."""
+
     prompt_id: str
     error: dict
 
@@ -79,12 +89,14 @@ class ExecutionError:
 @dataclass(frozen=True, kw_only=True)
 class ExecutionInterrupted:
     """Execution was interrupted (user cancelled)."""
+
     prompt_id: str
 
 
 @dataclass(frozen=True, kw_only=True)
 class PreviewImage:
     """A preview image from a sampler (binary frame)."""
+
     image: bytes
     image_type: str | None  # "jpeg", "png", or None when unknown
     metadata: dict | None
@@ -93,6 +105,7 @@ class PreviewImage:
 @dataclass(frozen=True, kw_only=True)
 class ServerEvent:
     """A server-sent event we don't have a typed wrapper for."""
+
     event_type: str
     data: dict
 
@@ -100,6 +113,7 @@ class ServerEvent:
 # ------------------------------------------------------------------
 # WebSocket connection + frame parsing.
 # ------------------------------------------------------------------
+
 
 def connect_websocket(base_url: str, client_id: str) -> websocket.WebSocket:
     """Open a WebSocket, negotiate feature flags, return the connected socket.
