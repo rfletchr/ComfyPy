@@ -2,7 +2,8 @@ import json
 import urllib.request
 import urllib.parse
 import uuid
-
+import typing
+import websocket
 from comfypy import ws
 
 
@@ -24,9 +25,7 @@ class ComfyClient:
     state across calls.  Instances are safe to share across threads.
     """
 
-    def __init__(
-        self, base_url: str = "http://127.0.0.1:8188", client_id: str | None = None
-    ):
+    def __init__(self, base_url: str = "http://127.0.0.1:8188", client_id: str | None = None):
         self.base_url = base_url.rstrip("/")
         self.client_id = client_id or uuid.uuid4().hex
         self._ws = None  # lazily connected via _ensure_connected()
@@ -55,9 +54,10 @@ class ComfyClient:
         the WebSocket connection closes.
         """
         self._ensure_connected()
+        socket = typing.cast(websocket.WebSocket, self._ws)
         while True:
             try:
-                raw = self._ws.recv()
+                raw = socket.recv()
             except Exception:
                 return
             event = ws.parse_message(raw)
@@ -194,9 +194,7 @@ class ComfyClient:
             body["partial_execution_targets"] = partial_execution_targets
         return post_json(self.base_url, "/prompt", body)
 
-    def post_queue(
-        self, *, clear: bool = False, delete: list[str] | None = None
-    ) -> None:
+    def post_queue(self, *, clear: bool = False, delete: list[str] | None = None) -> None:
         """Clear the queue and/or delete specific pending items by prompt ID."""
         body = {}
         if clear:
@@ -212,9 +210,7 @@ class ComfyClient:
             body["prompt_id"] = prompt_id
         _post_no_body(self.base_url, "/interrupt", body)
 
-    def post_free(
-        self, *, unload_models: bool = False, free_memory: bool = False
-    ) -> None:
+    def post_free(self, *, unload_models: bool = False, free_memory: bool = False) -> None:
         """Free GPU memory: unload models and/or force garbage collection."""
         body = {}
         if unload_models:
@@ -227,9 +223,7 @@ class ComfyClient:
     # History
     # --------------------------------------------------------------
 
-    def get_history(
-        self, *, max_items: int | None = None, offset: int | None = None
-    ) -> dict:
+    def get_history(self, *, max_items: int | None = None, offset: int | None = None) -> dict:
         """Execution history, newest first."""
         params: dict[str, str] = {}
         if max_items is not None:
@@ -245,9 +239,7 @@ class ComfyClient:
         path = "/history/" + urllib.parse.quote(prompt_id, safe="")
         return get_json(self.base_url, path)
 
-    def post_history(
-        self, *, clear: bool = False, delete: list[str] | None = None
-    ) -> None:
+    def post_history(self, *, clear: bool = False, delete: list[str] | None = None) -> None:
         """Clear the entire history and/or delete specific entries."""
         body = {}
         if clear:
@@ -414,9 +406,7 @@ def post_multipart(
                 value = value.encode()
             body_bytes += value + b"\r\n"
         else:
-            body_bytes += (
-                f'Content-Disposition: form-data; name="{name}"\r\n\r\n{value}\r\n'
-            ).encode()
+            body_bytes += (f'Content-Disposition: form-data; name="{name}"\r\n\r\n{value}\r\n').encode()
 
     body_bytes += ("--" + boundary + "--\r\n").encode()
 
